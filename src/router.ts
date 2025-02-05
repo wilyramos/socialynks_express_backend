@@ -9,7 +9,7 @@ const router = Router();
 router.post('/auth/register',
     body('handle')
         .notEmpty()
-        .withMessage('Handle is required'),
+        .withMessage('User is required'),
     body('name')
         .notEmpty()
         .withMessage('Name is required'),
@@ -17,7 +17,7 @@ router.post('/auth/register',
         .isEmail()  
         .withMessage('Email is required'),
     body('password')
-        .isLength({ min: 8 })
+        .isLength({ min: 6 })
         .withMessage('Password must be at least 6 characters'),
     handleInputErrors,
     createUser

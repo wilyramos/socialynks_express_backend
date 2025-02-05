@@ -10,17 +10,17 @@ import { v4 as uuid } from "uuid";
 
 export const createUser = async (req: Request, res: Response) => {
 
-    // Errors Management
-    let errors = validationResult(req)
+    // Errors Management replacpe for middleware validation
+    /* let errors = validationResult(req)
     if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
         return;
-    }
+    } */
 
     // verify email is unique
     const { email, password } = req.body;
-
     const userExists = await User.findOne({ email });
+
     if (userExists) {
         const error = new Error("Email already exists");
         res.status(409).json({ error: error.message });
@@ -76,7 +76,6 @@ export const login = async (req: Request, res: Response) => {
 
     const token = createToken({ id: user._id });
     res.send(token);
-
 }
 
 export const getUser = async (req: Request, res: Response) => {
