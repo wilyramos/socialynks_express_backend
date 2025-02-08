@@ -90,7 +90,7 @@ export const updateProfile = async (req: Request, res: Response) => {
         const handle = slug(req.body.handle, "");
         const handleExists = await User.findOne({ handle });
         if (handleExists && handleExists._id.toString() !== req.user._id.toString()) {
-            const error = new Error("Handle already exists");
+            const error = new Error("El nombre de usuario ya existe");
             res.status(409).json({ error: error.message });
             return;
         }

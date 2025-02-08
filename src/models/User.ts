@@ -1,5 +1,7 @@
 import mongoose, { Schema, type Document } from "mongoose";
 
+
+// Define the user schema and model. Extend the Document interface to include the user fields.
 export interface IUser extends Document {
     handle: string;
     name: string;
