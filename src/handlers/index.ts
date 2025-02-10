@@ -110,7 +110,10 @@ export const updateProfile = async (req: Request, res: Response) => {
 }
 
 export const uploadImage = async (req: Request, res: Response) => {
-    const form = formidable({ multiples: false }); // create a new formidable form and set the multiples option to true
+    
+    const form = formidable({ 
+        multiples: false,
+    }); // create a new formidable form and set the multiples option to true
     try {
         form.parse(req, (error, fields, files) => {
            cloudinary.uploader.upload(files.file[0].filepath, { public_id: uuid() }, 
@@ -142,7 +145,7 @@ export const getUserByHandle = async (req: Request, res: Response) => {
         const user = await User.findOne({ handle }).select("-password -email  -__v -_id");
 
         if (!user) {
-            const error = new Error("User not found");
+            const error = new Error("Usuario no encontrado");
             res.status(404).json({ error: error.message });
             return;
         }
@@ -157,11 +160,11 @@ export const searchByHandle = async (req: Request, res: Response) => {
         const { handle } = req.body;
         const userExists = await User.findOne({ handle })
         if(userExists){
-            res.status(409).json({ error: "Handle already exists" });
+            res.status(409).json({ error: "El usuario ya está registrado" });
             return;
             
         }
-        res.send(`${handle} is available`);
+        res.send(`${handle} está disponible`);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
