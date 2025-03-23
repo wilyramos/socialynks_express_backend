@@ -42,13 +42,10 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
                 return;
             }
             // send user through request
-
             req.user = user;
-
             next();
         }
     } catch (error) {
         res.status(401).json({error: "jwt Unauthorized"});
     }
-
 }

@@ -44,7 +44,7 @@ export const createUser = async (req: Request, res: Response) => {
 
     try {
         await user.save();
-        res.status(201).json("User created successfully" );
+        res.status(201).json("User created successfully");
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -56,26 +56,31 @@ export const login = async (req: Request, res: Response) => {
     // verify email exists
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) {
-        const error = new Error("User not found");
-        res.status(404).json({ error: error.message });
-        return;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            const error = new Error("User not found");
+            res.status(404).json({ error: error.message });
+            return;
+        }
+        // verify password
+        const passwordMatch = await comparePasswords(password, user.password);
+        if (!passwordMatch) {
+            const error = new Error("Invalid password");
+            res.status(401).json({ error: error.message });
+            return;
+        }
+
+        // generate JWT
+
+        const token = createToken({ id: user._id });
+        res.send(token);
+
+    } catch (error) {
+        // console.log(error)
+        res.status(400).json({ error: error.message });
+        console.log(error)
     }
-
-    // verify password
-
-    const passwordMatch = await comparePasswords(password, user.password);
-    if (!passwordMatch) {
-        const error = new Error("Invalid password");
-        res.status(401).json({ error: error.message });
-        return;
-    }
-
-    // generate JWT
-
-    const token = createToken({ id: user._id });
-    res.send(token);
 }
 
 export const getUser = async (req: Request, res: Response) => {
@@ -100,9 +105,9 @@ export const updateProfile = async (req: Request, res: Response) => {
         req.user.description = description;
         req.user.handle = handle;
         req.user.links = links;
-        
+
         await req.user.save();
-        res.send( "Profile updated successfully" );
+        res.send("Profile updated successfully");
 
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -110,26 +115,26 @@ export const updateProfile = async (req: Request, res: Response) => {
 }
 
 export const uploadImage = async (req: Request, res: Response) => {
-    
-    const form = formidable({ 
+
+    const form = formidable({
         multiples: false,
     }); // create a new formidable form and set the multiples option to true
     try {
         form.parse(req, (error, fields, files) => {
-           cloudinary.uploader.upload(files.file[0].filepath, { public_id: uuid() }, 
+            cloudinary.uploader.upload(files.file[0].filepath, { public_id: uuid() },
                 async function (error, result) {
-                        if(error) {
-                            const error = new Error("Error uploading image");
-                            res.status(400).json({ error: error.message });
-                        }
-                        if(result){
-                            req.user.image = result.secure_url;
-                            await req.user.save();
-                            res.json({ image: result.secure_url});
-                        }
-                })       
+                    if (error) {
+                        const error = new Error("Error uploading image");
+                        res.status(400).json({ error: error.message });
+                    }
+                    if (result) {
+                        req.user.image = result.secure_url;
+                        await req.user.save();
+                        res.json({ image: result.secure_url });
+                    }
+                })
         });
-        
+
     } catch (e) {
         const error = new Error("Error uploading image");
         res.status(400).json({ error: error.message });
@@ -139,8 +144,8 @@ export const uploadImage = async (req: Request, res: Response) => {
 
 
 export const getUserByHandle = async (req: Request, res: Response) => {
-    
-    try{
+
+    try {
         const { handle } = req.params;
         const user = await User.findOne({ handle }).select("-password -email  -__v -_id");
 
@@ -159,10 +164,10 @@ export const searchByHandle = async (req: Request, res: Response) => {
     try {
         const { handle } = req.body;
         const userExists = await User.findOne({ handle })
-        if(userExists){
+        if (userExists) {
             res.status(409).json({ error: "El usuario ya está registrado" });
             return;
-            
+
         }
         res.send(`${handle} está disponible`);
     } catch (error) {
