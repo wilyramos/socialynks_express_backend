@@ -44,7 +44,12 @@ export const createUser = async (req: Request, res: Response) => {
 
     try {
         await user.save();
-        res.status(201).json("User created successfully");
+
+        // Login the user
+        const token = createToken({ id: user._id });
+        res.send(token);
+        // res.status(201).json("User created successfully");
+        
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -141,7 +146,6 @@ export const uploadImage = async (req: Request, res: Response) => {
     }
     // upload image to cloudinary
 }
-
 
 export const getUserByHandle = async (req: Request, res: Response) => {
 
